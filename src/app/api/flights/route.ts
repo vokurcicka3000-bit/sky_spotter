@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchFlightsInBbox, bboxFromCenter, haversineKm, closestApproach } from '@/lib/opensky'
+import { fetchFlightsInBbox, bboxFromCenter, haversineKm, closestApproach, categoryToSize } from '@/lib/opensky'
 import { AIRPORTS } from '@/lib/airports'
+import { lookupAircraft } from '@/lib/aircraftDb'
+import { typecodeToSize } from '@/lib/typecodeToSize'
 import type { NearbyAirport, FlightWithAirport } from '@/lib/types'
 
 const DESCENDING_RATE_THRESHOLD = -1   // m/s — meaningfully sinking
@@ -76,6 +78,19 @@ export async function GET(req: NextRequest) {
           }
         }
 
+        // Aircraft size: prefer ADS-B category; fall back to registration DB lookup
+        let aircraftSize = categoryToSize(f.category)
+        let typecode: string | undefined
+        let icaoType: string | undefined
+        if (aircraftSize === 'unknown') {
+          const dbEntry = lookupAircraft(f.icao24)
+          typecode = dbEntry?.typecode
+          icaoType = dbEntry?.icaoType
+          if (dbEntry) {
+            aircraftSize = typecodeToSize(typecode, icaoType)
+          }
+        }
+
         return {
           ...f,
           nearestAirport,
@@ -85,6 +100,9 @@ export async function GET(req: NextRequest) {
           minutesUntilClosest,
           isDescending,
           isRelevant,
+          aircraftSize,
+          typecode,
+          icaoType,
         }
       })
 

@@ -30,17 +30,25 @@ function buildPlaneHtml(rotation: number, color: string, isHighlighted: boolean,
   const ring = isRelevant
     ? `<div style="position:absolute;inset:-4px;border-radius:50%;border:2px solid ${color};opacity:0.6;animation:ping 1.5s cubic-bezier(0,0,0.2,1) infinite;"></div>`
     : ''
+  // ✈ unicode points east by default; trueTrack is clockwise from north.
+  // To point north at 0°: rotate by (trueTrack - 90) degrees.
+  const cssRotation = rotation - 90
   return `<div style="position:relative;width:${size}px;height:${size}px;">
     ${ring}
     <div style="
       position:absolute;inset:0;
-      transform: rotate(${rotation}deg);
       display:flex;align-items:center;justify-content:center;
-      font-size:${size - 4}px;
-      filter:${shadow};
-      color:${color};
-      line-height:1;
-    ">✈</div>
+    ">
+      <span style="
+        display:inline-block;
+        font-size:${size - 4}px;
+        line-height:1;
+        color:${color};
+        filter:${shadow};
+        transform:rotate(${cssRotation}deg);
+        transform-origin:center center;
+      ">✈</span>
+    </div>
   </div>`
 }
 

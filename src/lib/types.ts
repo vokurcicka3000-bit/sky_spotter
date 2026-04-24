@@ -1,3 +1,12 @@
+export type AircraftSize =
+  | 'heavy'      // wide-body: B747, A380, B777, A330…
+  | 'large'      // narrow-body: B737, A320, B757…
+  | 'medium'     // regional jets / turboprops
+  | 'small'      // light GA / small props
+  | 'rotorcraft' // helicopter
+  | 'special'    // glider, UAV, ultralight, balloon…
+  | 'unknown'
+
 export interface Flight {
   icao24: string
   callsign: string | null
@@ -27,16 +36,16 @@ export interface NearbyAirport extends Airport {
 }
 
 export interface FlightWithAirport extends Flight {
-  // --- AirportFinder mode fields (still used there) ---
-  nearestAirport?: NearbyAirport
-  estimatedArrivalMin?: number
-
   // --- Spotter mode: user-centric fields ---
   distanceFromUserKm: number
-  closestApproachKm: number | null       // minimum distance the flight will reach to the user
-  minutesUntilClosest: number | null     // minutes until that closest point (negative = already past)
+  closestApproachKm: number | null
+  minutesUntilClosest: number | null
   isDescending: boolean
-  isRelevant: boolean                    // low + descending + will pass reasonably close
+  isRelevant: boolean
+  aircraftSize: AircraftSize
+  /** ICAO typecode from registration DB, e.g. "B738", "A320" */
+  typecode?: string
+  /** ICAO aircraft type string, e.g. "L2J", "H1T" */
+  icaoType?: string
 }
 
-export type AppMode = 'finder' | 'spotter'

@@ -1,13 +1,13 @@
 'use client'
 
-import type { FlightWithAirport } from '@/lib/types'
+import type { FlightWithAirport, AircraftSize } from '@/lib/types'
 
 interface Props {
   flights: FlightWithAirport[]
   highlightIcao?: string | null
   onHover?: (icao: string | null) => void
-  /** Spotter mode: show user-centric closest-pass columns instead of airport columns */
-  mode?: 'spotter' | 'finder'
+  onSelect?: (flight: FlightWithAirport) => void
+  selectedIcao?: string | null
 }
 
 function altColor(altM: number | null): string {
@@ -46,14 +46,28 @@ function closestPassLabel(km: number | null, min: number | null): string {
   return `${distStr} in ~${Math.round(min)} min`
 }
 
-function etaLabel(min: number | undefined) {
-  if (min === undefined) return '—'
-  if (min < 1) return '<1 min'
-  if (min > 120) return `${Math.round(min / 60)} h`
-  return `~${min} min`
+// Map size to display: [label, bracket, style]
+const SIZE_DISPLAY: Record<AircraftSize, { label: string; bracket: string; cls: string }> = {
+  heavy:      { label: 'Wide-body',   bracket: 'BIG',    cls: 'text-amber-600 dark:text-amber-400 font-bold' },
+  large:      { label: 'Narrow-body', bracket: 'BIG',    cls: 'text-sky-600 dark:text-sky-400 font-semibold' },
+  medium:     { label: 'Regional',    bracket: 'medium', cls: 'text-gray-600 dark:text-gray-300' },
+  small:      { label: 'Light',       bracket: 'small',  cls: 'text-gray-500 dark:text-gray-400' },
+  rotorcraft: { label: 'Helicopter',  bracket: 'heli',   cls: 'text-purple-600 dark:text-purple-400' },
+  special:    { label: 'Special',     bracket: 'other',  cls: 'text-gray-400' },
+  unknown:    { label: '—',           bracket: '',       cls: 'text-gray-400' },
 }
 
-export default function FlightTable({ flights, highlightIcao, onHover, mode = 'spotter' }: Props) {
+function SizeCell({ size }: { size: AircraftSize }) {
+  const d = SIZE_DISPLAY[size]
+  if (size === 'unknown') return <span className="text-gray-400">—</span>
+  return (
+    <span className={d.cls}>
+      {d.label}{d.bracket ? <span className="font-normal opacity-70"> ({d.bracket})</span> : null}
+    </span>
+  )
+}
+
+export default function FlightTable({ flights, highlightIcao, onHover, onSelect, selectedIcao }: Props) {
   if (flights.length === 0) {
     return (
       <div className="text-sm text-gray-500 py-6 text-center">
@@ -67,19 +81,12 @@ export default function FlightTable({ flights, highlightIcao, onHover, mode = 's
       <thead className="sticky top-0 z-10">
         <tr className="bg-gray-100 dark:bg-gray-800 text-left">
           <th className="px-2 py-1.5 font-semibold">Callsign</th>
+          <th className="px-2 py-1.5 font-semibold">Type</th>
           <th className="px-2 py-1.5 font-semibold">Altitude</th>
           <th className="px-2 py-1.5 font-semibold">V/S</th>
           <th className="px-2 py-1.5 font-semibold">Speed</th>
           <th className="px-2 py-1.5 font-semibold">Dist now</th>
-          {mode === 'spotter' && (
-            <th className="px-2 py-1.5 font-semibold">Closest pass</th>
-          )}
-          {mode === 'finder' && (
-            <>
-              <th className="px-2 py-1.5 font-semibold">Airport</th>
-              <th className="px-2 py-1.5 font-semibold">ETA</th>
-            </>
-          )}
+          <th className="px-2 py-1.5 font-semibold">Closest pass</th>
         </tr>
       </thead>
       <tbody>
@@ -89,21 +96,27 @@ export default function FlightTable({ flights, highlightIcao, onHover, mode = 's
           const isOverhead = f.distanceFromUserKm < 2
           const passingNow =
             f.minutesUntilClosest !== null && Math.abs(f.minutesUntilClosest) < 1
+          const isBig = f.aircraftSize === 'heavy' || f.aircraftSize === 'large'
 
           return (
             <tr
               key={f.icao24}
               className={`border-t border-gray-200 dark:border-gray-700 cursor-pointer transition-colors ${
-                highlightIcao === f.icao24
+                selectedIcao === f.icao24
+                  ? 'ring-2 ring-inset ring-blue-500 bg-blue-50 dark:bg-blue-900/40'
+                  : highlightIcao === f.icao24
                   ? 'bg-blue-100 dark:bg-blue-900/50'
                   : passingNow || isOverhead
                   ? 'bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-950/50'
+                  : isBig && f.isRelevant
+                  ? 'bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50'
                   : f.isRelevant
                   ? 'bg-emerald-50 dark:bg-emerald-950/30 hover:bg-emerald-100 dark:hover:bg-emerald-950/50'
                   : 'hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
               onMouseEnter={() => onHover?.(f.icao24)}
               onMouseLeave={() => onHover?.(null)}
+              onClick={() => onSelect?.(f)}
             >
               <td className="px-2 py-1.5">
                 <div className="flex items-center gap-1 flex-wrap">
@@ -118,6 +131,9 @@ export default function FlightTable({ flights, highlightIcao, onHover, mode = 's
                   )}
                 </div>
                 <div className="text-gray-400 text-[10px]">{f.originCountry}</div>
+              </td>
+              <td className="px-2 py-1.5">
+                <SizeCell size={f.aircraftSize} />
               </td>
               <td className="px-2 py-1.5">
                 <span style={{ color }} className="font-semibold">{altLabel(f.baroAltitude)}</span>
@@ -139,27 +155,13 @@ export default function FlightTable({ flights, highlightIcao, onHover, mode = 's
                   ? `${Math.round(f.distanceFromUserKm * 1000)} m`
                   : `${Math.round(f.distanceFromUserKm)} km`}
               </td>
-              {mode === 'spotter' && (
-                <td className={`px-2 py-1.5 font-semibold ${
-                  f.isRelevant
-                    ? 'text-emerald-700 dark:text-emerald-400'
-                    : 'text-gray-500 dark:text-gray-400'
-                }`}>
-                  {closestPassLabel(f.closestApproachKm, f.minutesUntilClosest)}
-                </td>
-              )}
-              {mode === 'finder' && (
-                <>
-                  <td className="px-2 py-1.5">
-                    {f.nearestAirport
-                      ? <span title={f.nearestAirport.name} className="font-mono">{f.nearestAirport.icao}</span>
-                      : <span className="text-gray-400">—</span>}
-                  </td>
-                  <td className="px-2 py-1.5 font-semibold text-emerald-700 dark:text-emerald-400">
-                    {etaLabel(f.estimatedArrivalMin)}
-                  </td>
-                </>
-              )}
+              <td className={`px-2 py-1.5 font-semibold ${
+                f.isRelevant
+                  ? 'text-emerald-700 dark:text-emerald-400'
+                  : 'text-gray-500 dark:text-gray-400'
+              }`}>
+                {closestPassLabel(f.closestApproachKm, f.minutesUntilClosest)}
+              </td>
             </tr>
           )
         })}
