@@ -44,19 +44,30 @@ function parseStateVector(sv: unknown[]): Flight {
   }
 }
 
+export interface FetchFlightsResult {
+  flights: Flight[]
+  rateLimited: boolean
+  stale: boolean  // true when serving cached data after a 429
+}
+
 export async function fetchFlightsInBbox(
   minLat: number,
   maxLat: number,
   minLon: number,
   maxLon: number
-): Promise<Flight[]> {
+): Promise<FetchFlightsResult> {
   const cacheKey = `${minLat.toFixed(3)},${maxLat.toFixed(3)},${minLon.toFixed(3)},${maxLon.toFixed(3)}`
   const cached = cache.get(cacheKey)
   const now = Date.now()
 
-  // Serve from cache if still fresh, or if we're in a rate-limit backoff window
-  if (cached && (now - cached.fetchedAt < CACHE_TTL_MS || now < rateLimitedUntil)) {
-    return cached.data
+  // Serve from cache if still fresh
+  if (cached && now - cached.fetchedAt < CACHE_TTL_MS) {
+    return { flights: cached.data, rateLimited: false, stale: false }
+  }
+
+  // Still in backoff window — serve stale cache if available
+  if (now < rateLimitedUntil) {
+    return { flights: cached?.data ?? [], rateLimited: true, stale: cached != null }
   }
 
   const url = `${OPENSKY_BASE}/states/all?lamin=${minLat}&lamax=${maxLat}&lomin=${minLon}&lomax=${maxLon}`
@@ -69,8 +80,7 @@ export async function fetchFlightsInBbox(
   if (res.status === 429) {
     rateLimitedUntil = now + RATE_LIMIT_BACKOFF_MS
     console.warn(`[opensky] 429 rate limited — backing off for ${RATE_LIMIT_BACKOFF_MS / 1000}s`)
-    // Return stale cache if available, otherwise empty array (don't throw)
-    return cached?.data ?? []
+    return { flights: cached?.data ?? [], rateLimited: true, stale: cached != null }
   }
 
   if (!res.ok) throw new Error(`OpenSky API error: ${res.status}`)
@@ -79,7 +89,7 @@ export async function fetchFlightsInBbox(
   const flights = data.states ? (data.states as unknown[][]).map(parseStateVector) : []
 
   cache.set(cacheKey, { data: flights, fetchedAt: now })
-  return flights
+  return { flights, rateLimited: false, stale: false }
 }
 
 // Degrees to radians

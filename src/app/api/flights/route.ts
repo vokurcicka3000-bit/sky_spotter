@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
   const bbox = bboxFromCenter(lat, lon, radiusKm)
 
   try {
-    const flights = await fetchFlightsInBbox(bbox.minLat, bbox.maxLat, bbox.minLon, bbox.maxLon)
+    const { flights, rateLimited, stale } = await fetchFlightsInBbox(bbox.minLat, bbox.maxLat, bbox.minLon, bbox.maxLon)
 
     // Airport data only needed for finder mode
     let nearbyAirports: NearbyAirport[] = []
@@ -124,7 +124,7 @@ export async function GET(req: NextRequest) {
       return (a.distanceFromUserKm) - (b.distanceFromUserKm)
     })
 
-    return NextResponse.json({ flights: filtered, airports: nearbyAirports, bbox })
+    return NextResponse.json({ flights: filtered, airports: nearbyAirports, bbox, rateLimited, stale })
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 502 })
   }

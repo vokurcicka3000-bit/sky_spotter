@@ -10,6 +10,8 @@ const FlightMap = dynamic(() => import('@/components/FlightMap'), { ssr: false }
 interface ApiResponse {
   flights: FlightWithAirport[]
   airports: NearbyAirport[]
+  rateLimited?: boolean
+  stale?: boolean
   error?: string
 }
 
@@ -34,6 +36,7 @@ export default function SpotterMode() {
   const [airports, setAirports] = useState<NearbyAirport[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [rateLimited, setRateLimited] = useState(false)
   const [highlightIcao, setHighlightIcao] = useState<string | null>(null)
   const [selectedFlight, setSelectedFlight] = useState<FlightWithAirport | null>(null)
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
@@ -71,6 +74,7 @@ export default function SpotterMode() {
       if (data.error) throw new Error(data.error)
       setFlights(data.flights)
       setAirports(data.airports)
+      setRateLimited(data.rateLimited ?? false)
       setLastRefresh(new Date())
     } catch (e) {
       setError(String(e))
@@ -255,6 +259,12 @@ export default function SpotterMode() {
       {error && (
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-400 px-4 py-2 rounded text-sm">
           {error}
+        </div>
+      )}
+
+      {rateLimited && (
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 px-4 py-2 rounded text-sm">
+          OpenSky API rate limit reached — showing last known data. Resets after ~60 seconds or at midnight UTC.
         </div>
       )}
 
