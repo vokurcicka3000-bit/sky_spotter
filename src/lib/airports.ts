@@ -1,0 +1,42 @@
+import type { Airport } from './types'
+
+// A curated list of European/world airports with ICAO codes
+// In a real app you'd use a full airport database (e.g. OurAirports CSV)
+export const AIRPORTS: Airport[] = [
+  { icao: 'EGLL', name: 'London Heathrow', city: 'London', latitude: 51.4775, longitude: -0.4614, country: 'UK' },
+  { icao: 'LFPG', name: 'Paris Charles de Gaulle', city: 'Paris', latitude: 49.0097, longitude: 2.5479, country: 'France' },
+  { icao: 'EDDF', name: 'Frankfurt Airport', city: 'Frankfurt', latitude: 50.0379, longitude: 8.5622, country: 'Germany' },
+  { icao: 'EHAM', name: 'Amsterdam Schiphol', city: 'Amsterdam', latitude: 52.3086, longitude: 4.7639, country: 'Netherlands' },
+  { icao: 'LEMD', name: 'Madrid Barajas', city: 'Madrid', latitude: 40.4936, longitude: -3.5668, country: 'Spain' },
+  { icao: 'LIRF', name: 'Rome Fiumicino', city: 'Rome', latitude: 41.8003, longitude: 12.2389, country: 'Italy' },
+  { icao: 'LSZH', name: 'Zurich Airport', city: 'Zurich', latitude: 47.4647, longitude: 8.5492, country: 'Switzerland' },
+  { icao: 'LOWW', name: 'Vienna International', city: 'Vienna', latitude: 48.1102, longitude: 16.5697, country: 'Austria' },
+  { icao: 'LKPR', name: 'Prague Václav Havel', city: 'Prague', latitude: 50.1008, longitude: 14.26, country: 'Czech Republic' },
+  { icao: 'EPWA', name: 'Warsaw Chopin', city: 'Warsaw', latitude: 52.1657, longitude: 20.9671, country: 'Poland' },
+  { icao: 'EKCH', name: 'Copenhagen Airport', city: 'Copenhagen', latitude: 55.6181, longitude: 12.6561, country: 'Denmark' },
+  { icao: 'ESSA', name: 'Stockholm Arlanda', city: 'Stockholm', latitude: 59.6519, longitude: 17.9186, country: 'Sweden' },
+  { icao: 'EFHK', name: 'Helsinki-Vantaa', city: 'Helsinki', latitude: 60.3172, longitude: 24.9633, country: 'Finland' },
+  { icao: 'UUEE', name: 'Moscow Sheremetyevo', city: 'Moscow', latitude: 55.9736, longitude: 37.4125, country: 'Russia' },
+  { icao: 'LTBA', name: 'Istanbul Atatürk', city: 'Istanbul', latitude: 40.9769, longitude: 28.8146, country: 'Turkey' },
+  { icao: 'LGAV', name: 'Athens International', city: 'Athens', latitude: 37.9364, longitude: 23.9445, country: 'Greece' },
+  { icao: 'LPPT', name: 'Lisbon Airport', city: 'Lisbon', latitude: 38.7813, longitude: -9.1359, country: 'Portugal' },
+  { icao: 'EBBR', name: 'Brussels Airport', city: 'Brussels', latitude: 50.9014, longitude: 4.4844, country: 'Belgium' },
+  { icao: 'ENGM', name: 'Oslo Gardermoen', city: 'Oslo', latitude: 60.1939, longitude: 11.1004, country: 'Norway' },
+  { icao: 'LHBP', name: 'Budapest Ferenc Liszt', city: 'Budapest', latitude: 47.4298, longitude: 19.2611, country: 'Hungary' },
+  { icao: 'EGGW', name: 'London Luton', city: 'London', latitude: 51.8747, longitude: -0.3683, country: 'UK' },
+  { icao: 'EGKK', name: 'London Gatwick', city: 'London', latitude: 51.1481, longitude: -0.1903, country: 'UK' },
+  { icao: 'EGCC', name: 'Manchester Airport', city: 'Manchester', latitude: 53.3537, longitude: -2.2750, country: 'UK' },
+  { icao: 'EDDM', name: 'Munich Airport', city: 'Munich', latitude: 48.3537, longitude: 11.7750, country: 'Germany' },
+  { icao: 'EDDB', name: 'Berlin Brandenburg', city: 'Berlin', latitude: 52.3667, longitude: 13.5033, country: 'Germany' },
+  { icao: 'EIDW', name: 'Dublin Airport', city: 'Dublin', latitude: 53.4213, longitude: -6.2701, country: 'Ireland' },
+  { icao: 'LCLK', name: 'Larnaca International', city: 'Larnaca', latitude: 34.8751, longitude: 33.6249, country: 'Cyprus' },
+  { icao: 'LDZA', name: 'Zagreb Airport', city: 'Zagreb', latitude: 45.7429, longitude: 16.0688, country: 'Croatia' },
+  { icao: 'LYBE', name: 'Belgrade Nikola Tesla', city: 'Belgrade', latitude: 44.8184, longitude: 20.3091, country: 'Serbia' },
+  { icao: 'LWSK', name: 'Skopje Airport', city: 'Skopje', latitude: 41.9616, longitude: 21.6214, country: 'North Macedonia' },
+  // North America
+  { icao: 'KJFK', name: 'John F. Kennedy Intl', city: 'New York', latitude: 40.6413, longitude: -73.7781, country: 'USA' },
+  { icao: 'KLAX', name: 'Los Angeles Intl', city: 'Los Angeles', latitude: 33.9425, longitude: -118.4081, country: 'USA' },
+  { icao: 'KORD', name: "O'Hare International", city: 'Chicago', latitude: 41.9742, longitude: -87.9073, country: 'USA' },
+  { icao: 'KATL', name: 'Hartsfield-Jackson Atlanta', city: 'Atlanta', latitude: 33.6407, longitude: -84.4277, country: 'USA' },
+  { icao: 'CYYZ', name: 'Toronto Pearson', city: 'Toronto', latitude: 43.6777, longitude: -79.6248, country: 'Canada' },
+]
