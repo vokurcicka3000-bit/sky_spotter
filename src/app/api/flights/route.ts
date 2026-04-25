@@ -78,17 +78,14 @@ export async function GET(req: NextRequest) {
           }
         }
 
-        // Aircraft size: prefer ADS-B category; fall back to registration DB lookup
+        // Aircraft size: prefer ADS-B category; fall back to registration DB lookup.
+        // Always look up the DB for typecode (for display), even if category already gave a size.
+        const dbEntry = lookupAircraft(f.icao24)
+        const typecode = dbEntry?.typecode
+        const icaoType = dbEntry?.icaoType
         let aircraftSize = categoryToSize(f.category)
-        let typecode: string | undefined
-        let icaoType: string | undefined
-        if (aircraftSize === 'unknown') {
-          const dbEntry = lookupAircraft(f.icao24)
-          typecode = dbEntry?.typecode
-          icaoType = dbEntry?.icaoType
-          if (dbEntry) {
-            aircraftSize = typecodeToSize(typecode, icaoType)
-          }
+        if (aircraftSize === 'unknown' && dbEntry) {
+          aircraftSize = typecodeToSize(typecode, icaoType)
         }
 
         return {
