@@ -416,6 +416,8 @@ export default function SpotterMode() {
                       : `in ~${Math.round(selectedFlight.minutesUntilClosest)} min`)
                     : '—'}
                 />
+                <Field label="From" value={selectedFlight.departure ?? '—'} />
+                <Field label="To" value={selectedFlight.arrival ?? '—'} />
                 <Field label="Type" value={selectedFlight.modelName ?? selectedFlight.typecode ?? '—'} />
                 <Field label="Size class" value={
                   selectedFlight.aircraftSize === 'heavy' ? 'Wide-body (BIG)' :

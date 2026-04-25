@@ -49,5 +49,9 @@ export interface FlightWithAirport extends Flight {
   icaoType?: string
   /** Human-readable model name, e.g. "Boeing 737-800" */
   modelName?: string
+  /** Departure airport ICAO code, e.g. "EGLL" */
+  departure?: string | null
+  /** Arrival airport ICAO code, e.g. "LKPR" */
+  arrival?: string | null
 }
 

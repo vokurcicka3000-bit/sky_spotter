@@ -202,6 +202,54 @@ export function categoryToSize(cat: number): AircraftSize {
   }
 }
 
+// ---- Route lookup -------------------------------------------------------
+// Fetches departure/arrival airports for a given icao24.
+// Results are cached for 1 hour — routes don't change mid-flight.
+// Uses the OpenSky /flights/aircraft endpoint (counts against daily quota).
+
+export interface FlightRoute {
+  departure: string | null   // ICAO airport code, e.g. "EGLL"
+  arrival: string | null
+}
+
+interface RouteCacheEntry { route: FlightRoute; fetchedAt: number }
+const routeCache = new Map<string, RouteCacheEntry>()
+const ROUTE_TTL_MS = 60 * 60 * 1000  // 1 hour
+
+export async function fetchFlightRoute(icao24: string): Promise<FlightRoute> {
+  const cached = routeCache.get(icao24)
+  if (cached && Date.now() - cached.fetchedAt < ROUTE_TTL_MS) {
+    return cached.route
+  }
+
+  // Look back 6 hours to catch the departure
+  const end = Math.floor(Date.now() / 1000)
+  const begin = end - 6 * 3600
+  const url = `${OPENSKY_BASE}/flights/aircraft?icao24=${icao24}&begin=${begin}&end=${end}`
+  const headers: Record<string, string> = {}
+  const auth = authHeader()
+  if (auth) headers['Authorization'] = auth
+
+  try {
+    const res = await fetch(url, { headers, next: { revalidate: 0 } })
+    if (!res.ok) {
+      routeCache.set(icao24, { route: { departure: null, arrival: null }, fetchedAt: Date.now() })
+      return { departure: null, arrival: null }
+    }
+    const data = await res.json() as Array<{ estDepartureAirport?: string; estArrivalAirport?: string }>
+    // Take the most recent flight entry
+    const entry = data[data.length - 1]
+    const route: FlightRoute = {
+      departure: entry?.estDepartureAirport ?? null,
+      arrival: entry?.estArrivalAirport ?? null,
+    }
+    routeCache.set(icao24, { route, fetchedAt: Date.now() })
+    return route
+  } catch {
+    return { departure: null, arrival: null }
+  }
+}
+
 // Build a bounding box around a center point with radius in km
 export function bboxFromCenter(
   lat: number,

@@ -133,6 +133,11 @@ export default function FlightTable({ flights, highlightIcao, onHover, onSelect,
                   )}
                 </div>
                 <div className="text-gray-400 text-[10px]">{f.originCountry}</div>
+                {(f.departure || f.arrival) && (
+                  <div className="text-[10px] font-mono text-gray-500 dark:text-gray-400 mt-0.5">
+                    {f.departure ?? '?'} → {f.arrival ?? '?'}
+                  </div>
+                )}
               </td>
               <td className="px-2 py-1.5">
                 <SizeCell size={f.aircraftSize} typecode={f.typecode} modelName={f.modelName} />

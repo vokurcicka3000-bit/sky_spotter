@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchFlightsInBbox, bboxFromCenter, haversineKm, closestApproach, categoryToSize } from '@/lib/opensky'
+import { fetchFlightsInBbox, fetchFlightRoute, bboxFromCenter, haversineKm, closestApproach, categoryToSize } from '@/lib/opensky'
 import { AIRPORTS } from '@/lib/airports'
 import { lookupAircraft } from '@/lib/aircraftDb'
 import { typecodeToSize, typecodeToName } from '@/lib/typecodeToSize'
@@ -39,9 +39,12 @@ export async function GET(req: NextRequest) {
         .sort((a, b) => a.distanceKm - b.distanceKm)
     }
 
-    const enriched: FlightWithAirport[] = flights
-      .filter((f) => !f.onGround && f.latitude !== null && f.longitude !== null)
-      .map((f) => {
+    const airborne = flights.filter((f) => !f.onGround && f.latitude !== null && f.longitude !== null)
+
+    // Fetch routes for all airborne flights in parallel (results are cached 1h each)
+    const routes = await Promise.all(airborne.map((f) => fetchFlightRoute(f.icao24)))
+
+    const enriched: FlightWithAirport[] = airborne.map((f, i) => {
         const distanceFromUserKm = haversineKm(lat, lon, f.latitude!, f.longitude!)
         const isDescending = f.verticalRate !== null && f.verticalRate < DESCENDING_RATE_THRESHOLD
 
@@ -102,6 +105,8 @@ export async function GET(req: NextRequest) {
           typecode,
           icaoType,
           modelName,
+          departure: routes[i].departure,
+          arrival: routes[i].arrival,
         }
       })
 
