@@ -416,6 +416,7 @@ export default function SpotterMode() {
                       : `in ~${Math.round(selectedFlight.minutesUntilClosest)} min`)
                     : '—'}
                 />
+                <Field label="Type" value={selectedFlight.modelName ?? selectedFlight.typecode ?? '—'} />
                 <Field label="Size class" value={
                   selectedFlight.aircraftSize === 'heavy' ? 'Wide-body (BIG)' :
                   selectedFlight.aircraftSize === 'large' ? 'Narrow-body (BIG)' :
@@ -424,7 +425,6 @@ export default function SpotterMode() {
                   selectedFlight.aircraftSize === 'rotorcraft' ? 'Helicopter' :
                   selectedFlight.aircraftSize === 'special' ? 'Special' : '—'
                 } />
-                <Field label="Type" value={selectedFlight.typecode ?? '—'} />
               </div>
             </div>
           )}

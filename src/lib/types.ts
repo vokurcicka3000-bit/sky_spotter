@@ -47,5 +47,7 @@ export interface FlightWithAirport extends Flight {
   typecode?: string
   /** ICAO aircraft type string, e.g. "L2J", "H1T" */
   icaoType?: string
+  /** Human-readable model name, e.g. "Boeing 737-800" */
+  modelName?: string
 }
 

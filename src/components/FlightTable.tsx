@@ -57,12 +57,13 @@ const SIZE_LABEL: Record<AircraftSize, { text: string; cls: string }> = {
   unknown:    { text: '—',      cls: 'text-gray-400' },
 }
 
-function SizeCell({ size, typecode }: { size: AircraftSize; typecode?: string }) {
+function SizeCell({ size, typecode, modelName }: { size: AircraftSize; typecode?: string; modelName?: string }) {
   const d = SIZE_LABEL[size]
+  const display = modelName ?? typecode
   return (
     <span className={d.cls}>
-      {typecode
-        ? <><span className="font-mono font-semibold text-gray-700 dark:text-gray-200">{typecode}</span> <span className="opacity-60 text-xs">{d.text}</span></>
+      {display
+        ? <><span className="font-semibold text-gray-700 dark:text-gray-200">{display}</span> <span className="opacity-60 text-xs">{d.text}</span></>
         : d.text}
     </span>
   )
@@ -134,7 +135,7 @@ export default function FlightTable({ flights, highlightIcao, onHover, onSelect,
                 <div className="text-gray-400 text-[10px]">{f.originCountry}</div>
               </td>
               <td className="px-2 py-1.5">
-                <SizeCell size={f.aircraftSize} typecode={f.typecode} />
+                <SizeCell size={f.aircraftSize} typecode={f.typecode} modelName={f.modelName} />
               </td>
               <td className="px-2 py-1.5">
                 <span style={{ color }} className="font-semibold">{altLabel(f.baroAltitude)}</span>

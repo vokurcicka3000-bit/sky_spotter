@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { fetchFlightsInBbox, bboxFromCenter, haversineKm, closestApproach, categoryToSize } from '@/lib/opensky'
 import { AIRPORTS } from '@/lib/airports'
 import { lookupAircraft } from '@/lib/aircraftDb'
-import { typecodeToSize } from '@/lib/typecodeToSize'
+import { typecodeToSize, typecodeToName } from '@/lib/typecodeToSize'
 import type { NearbyAirport, FlightWithAirport } from '@/lib/types'
 
 const DESCENDING_RATE_THRESHOLD = -1   // m/s — meaningfully sinking
@@ -83,6 +83,7 @@ export async function GET(req: NextRequest) {
         const dbEntry = lookupAircraft(f.icao24)
         const typecode = dbEntry?.typecode
         const icaoType = dbEntry?.icaoType
+        const modelName = typecodeToName(typecode)
         let aircraftSize = categoryToSize(f.category)
         if (aircraftSize === 'unknown' && dbEntry) {
           aircraftSize = typecodeToSize(typecode, icaoType)
@@ -100,6 +101,7 @@ export async function GET(req: NextRequest) {
           aircraftSize,
           typecode,
           icaoType,
+          modelName,
         }
       })
 
