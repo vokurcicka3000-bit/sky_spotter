@@ -424,6 +424,7 @@ export default function SpotterMode() {
                   selectedFlight.aircraftSize === 'rotorcraft' ? 'Helicopter' :
                   selectedFlight.aircraftSize === 'special' ? 'Special' : '—'
                 } />
+                <Field label="Type" value={selectedFlight.typecode ?? '—'} />
               </div>
             </div>
           )}

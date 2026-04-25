@@ -46,23 +46,24 @@ function closestPassLabel(km: number | null, min: number | null): string {
   return `${distStr} in ~${Math.round(min)} min`
 }
 
-// Map size to display: [label, bracket, style]
-const SIZE_DISPLAY: Record<AircraftSize, { label: string; bracket: string; cls: string }> = {
-  heavy:      { label: 'Wide-body',   bracket: 'BIG',    cls: 'text-amber-600 dark:text-amber-400 font-bold' },
-  large:      { label: 'Narrow-body', bracket: 'BIG',    cls: 'text-sky-600 dark:text-sky-400 font-semibold' },
-  medium:     { label: 'Regional',    bracket: 'medium', cls: 'text-gray-600 dark:text-gray-300' },
-  small:      { label: 'Light',       bracket: 'small',  cls: 'text-gray-500 dark:text-gray-400' },
-  rotorcraft: { label: 'Helicopter',  bracket: 'heli',   cls: 'text-purple-600 dark:text-purple-400' },
-  special:    { label: 'Special',     bracket: 'other',  cls: 'text-gray-400' },
-  unknown:    { label: '—',           bracket: '',       cls: 'text-gray-400' },
+// Map size to a simple label for the overview table
+const SIZE_LABEL: Record<AircraftSize, { text: string; cls: string }> = {
+  heavy:      { text: 'BIG',    cls: 'text-amber-600 dark:text-amber-400 font-bold' },
+  large:      { text: 'BIG',    cls: 'text-sky-600 dark:text-sky-400 font-bold' },
+  medium:     { text: 'medium', cls: 'text-gray-500 dark:text-gray-400' },
+  small:      { text: 'small',  cls: 'text-gray-400 dark:text-gray-500' },
+  rotorcraft: { text: 'heli',   cls: 'text-purple-600 dark:text-purple-400' },
+  special:    { text: 'other',  cls: 'text-gray-400' },
+  unknown:    { text: '—',      cls: 'text-gray-400' },
 }
 
-function SizeCell({ size }: { size: AircraftSize }) {
-  const d = SIZE_DISPLAY[size]
-  if (size === 'unknown') return <span className="text-gray-400">—</span>
+function SizeCell({ size, typecode }: { size: AircraftSize; typecode?: string }) {
+  const d = SIZE_LABEL[size]
   return (
     <span className={d.cls}>
-      {d.label}{d.bracket ? <span className="font-normal opacity-70"> ({d.bracket})</span> : null}
+      {typecode
+        ? <><span className="font-mono font-semibold text-gray-700 dark:text-gray-200">{typecode}</span> <span className="opacity-60 text-xs">{d.text}</span></>
+        : d.text}
     </span>
   )
 }
@@ -133,7 +134,7 @@ export default function FlightTable({ flights, highlightIcao, onHover, onSelect,
                 <div className="text-gray-400 text-[10px]">{f.originCountry}</div>
               </td>
               <td className="px-2 py-1.5">
-                <SizeCell size={f.aircraftSize} />
+                <SizeCell size={f.aircraftSize} typecode={f.typecode} />
               </td>
               <td className="px-2 py-1.5">
                 <span style={{ color }} className="font-semibold">{altLabel(f.baroAltitude)}</span>

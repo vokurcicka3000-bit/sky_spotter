@@ -12,14 +12,15 @@
  * where "t" = typecode (e.g. "B738", "A320") and "i" = ICAO aircraft type (e.g. "L2J")
  */
 
-import { createWriteStream, mkdirSync } from 'fs'
-import { writeFileSync } from 'fs'
+import { mkdirSync, writeFileSync } from 'fs'
 import { createInterface } from 'readline'
 import { get as httpsGet } from 'https'
+import { fileURLToPath } from 'url'
 import path from 'path'
 
 const CSV_URL = 'https://s3.opensky-network.org/data-samples/metadata/aircraftDatabase.csv'
-const OUT_DIR = path.join(import.meta.dirname, '..', 'data')
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const OUT_DIR = path.join(__dirname, '..', 'data')
 const OUT_FILE = path.join(OUT_DIR, 'aircraft-db.json')
 
 type Row = { t?: string; i?: string }
