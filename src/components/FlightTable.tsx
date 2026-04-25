@@ -49,8 +49,8 @@ function closestPassLabel(km: number | null, min: number | null): string {
 // Map size to a simple label for the overview table
 const SIZE_LABEL: Record<AircraftSize, { text: string; cls: string }> = {
   heavy:      { text: 'BIG',    cls: 'text-amber-600 dark:text-amber-400 font-bold' },
-  large:      { text: 'BIG',    cls: 'text-sky-600 dark:text-sky-400 font-bold' },
-  medium:     { text: 'medium', cls: 'text-gray-500 dark:text-gray-400' },
+  large:      { text: 'medium', cls: 'text-sky-600 dark:text-sky-400 font-semibold' },
+  medium:     { text: 'small',  cls: 'text-gray-500 dark:text-gray-400' },
   small:      { text: 'small',  cls: 'text-gray-400 dark:text-gray-500' },
   rotorcraft: { text: 'heli',   cls: 'text-purple-600 dark:text-purple-400' },
   special:    { text: 'other',  cls: 'text-gray-400' },
@@ -98,7 +98,7 @@ export default function FlightTable({ flights, highlightIcao, onHover, onSelect,
           const isOverhead = f.distanceFromUserKm < 2
           const passingNow =
             f.minutesUntilClosest !== null && Math.abs(f.minutesUntilClosest) < 1
-          const isBig = f.aircraftSize === 'heavy' || f.aircraftSize === 'large'
+          const isBig = f.aircraftSize === 'heavy'
 
           return (
             <tr

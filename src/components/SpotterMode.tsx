@@ -419,8 +419,8 @@ export default function SpotterMode() {
                 <Field label="Type" value={selectedFlight.modelName ?? selectedFlight.typecode ?? '—'} />
                 <Field label="Size class" value={
                   selectedFlight.aircraftSize === 'heavy' ? 'Wide-body (BIG)' :
-                  selectedFlight.aircraftSize === 'large' ? 'Narrow-body (BIG)' :
-                  selectedFlight.aircraftSize === 'medium' ? 'Regional (medium)' :
+                  selectedFlight.aircraftSize === 'large' ? 'Narrow-body (medium)' :
+                  selectedFlight.aircraftSize === 'medium' ? 'Regional (small)' :
                   selectedFlight.aircraftSize === 'small' ? 'Light (small)' :
                   selectedFlight.aircraftSize === 'rotorcraft' ? 'Helicopter' :
                   selectedFlight.aircraftSize === 'special' ? 'Special' : '—'

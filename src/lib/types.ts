@@ -1,8 +1,8 @@
 export type AircraftSize =
-  | 'heavy'      // wide-body: B747, A380, B777, A330…
-  | 'large'      // narrow-body: B737, A320, B757…
-  | 'medium'     // regional jets / turboprops
-  | 'small'      // light GA / small props
+  | 'heavy'      // wide-body: B747, A380, B777, A330, B787… → BIG
+  | 'large'      // narrow-body: B737, A320, B757, E190…     → medium
+  | 'medium'     // regional jets / turboprops: CRJ, ATR…    → small
+  | 'small'      // light GA / small props                   → small
   | 'rotorcraft' // helicopter
   | 'special'    // glider, UAV, ultralight, balloon…
   | 'unknown'
